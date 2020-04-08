@@ -49,20 +49,40 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 ![](images/part1/part1-vm-3000InboudRule.png)
 
 7. La función que calcula en enésimo número de la secuencia de Fibonacci está muy mal construido y consume bastante CPU para obtener la respuesta. Usando la consola del Browser documente los tiempos de respuesta para dicho endpoint usando los siguintes valores:
-    * 1000000
-    * 1010000
-    * 1020000
-    * 1030000
-    * 1040000
-    * 1050000
-    * 1060000
-    * 1070000
-    * 1080000
-    * 1090000    
+	* 1000000
+   
+   ![](images/tiempo_1.png)
+   * 1010000
+   
+   ![](images/tiempo_2.png)
+	* 1020000
+   
+	![](images/tiempo_3.png)
+	* 1030000
+   
+   ![](images/tiempo_4.png)
+	* 1040000
+   
+	![](images/tiempo_5.png)
+	* 1050000
+   
+	![](images/tiempo_6.png)
+	* 1060000
+   
+	![](images/tiempo_7.png)
+	* 1070000
+   
+	![](images/tiempo_8.png)
+	* 1080000
+   
+	![](images/tiempo_9.png)
+	* 1090000
+   
+	![](images/tiempo_10.png) 
 
 8. Dírijase ahora a Azure y verifique el consumo de CPU para la VM. (Los resultados pueden tardar 5 minutos en aparecer).
 
-![Imágen 2](images/part1/part1-vm-cpu.png)
+![Imágen 2](images/consumo_cpu.png)
 
 9. Ahora usaremos Postman para simular una carga concurrente a nuestro sistema. Siga estos pasos.
     * Instale newman con el comando `npm install newman -g`. Para conocer más de Newman consulte el siguiente [enlace](https://learning.getpostman.com/docs/postman/collection-runs/command-line-integration-with-newman/).
@@ -81,20 +101,36 @@ Cuando un conjunto de usuarios consulta un enésimo número (superior a 1000000)
 
 11. Una vez el cambio se vea reflejado, repita el paso 7, 8 y 9.
 12. Evalue el escenario de calidad asociado al requerimiento no funcional de escalabilidad y concluya si usando este modelo de escalabilidad logramos cumplirlo.
+   -  Antes del aumento el consumo de CPU es superior al 93%, por lo que en este caso no se cumple con el requerimiento. ...
 13. Vuelva a dejar la VM en el tamaño inicial para evitar cobros adicionales.
 
 **Preguntas**
 
 1. ¿Cuántos y cuáles recursos crea Azure junto con la VM?
+   ![](images/recursos.PNG)
 2. ¿Brevemente describa para qué sirve cada recurso?
+   -  El primer recurso es el recurso asociado a la red virtual en la que se encuentra la máquina
+   -  El seguno, no entiendo para que es. Aparenta ser una cuenta que permite el acceso al almacenamiento, algo así.
+   -  Es el recurso que contiene a la maquina virtual en si
+   -  Archivo de dirección pública asignada a la máquina.
+   -  Grupo de seguridad que supongo permite las reglas de acceso a la máquina.
+   -  Este archivo no lo comprendo demasiado, parece ser el archivo que contiene la "lógica" de la tarjeta de red asignada a la máquina.
+   -  Es el archivo "Disco" que permite el almacenamiento.
 3. ¿Al cerrar la conexión ssh con la VM, por qué se cae la aplicación que ejecutamos con el comando `npm FibonacciApp.js`? ¿Por qué debemos crear un *Inbound port rule* antes de acceder al servicio?
+   *  Al cerrar la conexión SSH se interrumpen todos los procesos que se encuentren en ejecución, al ejecutar el FibonacciApp.js sin el forever lo que hubiese pasado es que al cerrar la conexión se hubiese terminado el proceso que se estaba ejecutando.
+   *  Respecto al inbound port, es necesario pues el grupo de seguridad evitará las conexiones que no esten autorizadas, justamente con el objetivo de mantener la seguridad. Al añadir la regla, permitimos el acceso a la máquina por el puerto seleccionado.
 4. Adjunte tabla de tiempos e interprete por qué la función tarda tando tiempo.
+   *  Aparentemente la función esta recalculando valores que en peticiones anteriores ya uso, es decir, al invocar la función para el valor 1000000 lo calcula y al invocar la función para el valore 1010000 no reutiliza la información del calculo anterior, y recalcula todo desde 0.
 5. Adjunte imágen del consumo de CPU de la VM e interprete por qué la función consume esa cantidad de CPU.
+   *  ![](images/respuesta_5.PNG)
 6. Adjunte la imagen del resumen de la ejecución de Postman. Interprete:
+   ![](images/postman.PNG)
     * Tiempos de ejecución de cada petición.
     * Si hubo fallos documentelos y explique.
 7. ¿Cuál es la diferencia entre los tamaños `B2ms` y `B1ls` (no solo busque especificaciones de infraestructura)?
+   *  El costo aumenta al aumentar la capacidad
 8. ¿Aumentar el tamaño de la VM es una buena solución en este escenario?, ¿Qué pasa con la FibonacciApp cuando cambiamos el tamaño de la VM?
+   * Esta solución no nos parece buena, pues una mejor solución seria reestructurar un poco el funcionamiento del sistema.
 9. ¿Qué pasa con la infraestructura cuando cambia el tamaño de la VM? ¿Qué efectos negativos implica?
 10. ¿Hubo mejora en el consumo de CPU o en los tiempos de respuesta? Si/No ¿Por qué?
 11. Aumente la cantidad de ejecuciones paralelas del comando de postman a `4`. ¿El comportamiento del sistema es porcentualmente mejor?
